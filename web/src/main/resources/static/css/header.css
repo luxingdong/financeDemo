@@ -1,0 +1,40 @@
+.header-wrapper {
+  width: 100%;
+  height: 0.8rem;
+  background-color: #fff;
+  border-bottom: 0.01rem solid #e1e1e1; }
+  .header-wrapper .logo {
+    width: 1.73rem;
+    height: 0.38rem;
+    margin-top: 0.21rem;
+    margin-right: 0.75rem; }
+  .header-wrapper .nav {
+    width: 5rem;
+    height: 0.23rem;
+    margin-top: 0.29rem; }
+    .header-wrapper .nav ul li {
+      float: left;
+      margin-right: 0.5rem;
+      line-height: 0.23rem;
+      padding-bottom: 0.02rem; }
+      .header-wrapper .nav ul li a {
+        color: #555;
+        font-weight: 300;
+        font-size: 0.18rem; }
+      .header-wrapper .nav ul li:hover, .header-wrapper .nav ul li.active {
+        border-bottom: 0.03rem solid #50D28C; }
+        .header-wrapper .nav ul li:hover a, .header-wrapper .nav ul li.active a {
+          color: #50D28C; }
+  .header-wrapper .login-reg {
+    width: 2rem;
+    text-align: right;
+    padding-top: 0.31rem; }
+    .header-wrapper .login-reg a, .header-wrapper .login-reg span {
+      font-size: 0.14rem;
+      font-weight: 300;
+      color: #555;
+      line-height: 0.18rem; }
+    .header-wrapper .login-reg a:hover {
+      color: #50D28C; }
+    .header-wrapper .login-reg span {
+      margin: 0 0.15rem; }

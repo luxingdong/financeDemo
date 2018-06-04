@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yzw.dao.ISupplierDao">
+    <resultMap id="BaseResultMap" type="com.yzw.entity.po.Supplier">
+        <id column="FSysNo" jdbcType="INTEGER" property="sysno"/>
+        <result column="BusinessType" jdbcType="INTEGER" property="businesstype"/>
+        <result column="SupplierSysNo" jdbcType="INTEGER" property="suppliersysno"/>
+        <result column="SupplierName" jdbcType="VARCHAR" property="suppliername"/>
+        <result column="Type" jdbcType="VARCHAR" property="type"/>
+        <result column="SocialCreditNumber" jdbcType="VARCHAR" property="socialcreditnumber"/>
+        <result column="BizRegisterCode" jdbcType="VARCHAR" property="bizregistercode"/>
+        <result column="OrganizationCode" jdbcType="VARCHAR" property="organizationcode"/>
+        <result column="RepresentPeopleName" jdbcType="VARCHAR" property="representpeoplename"/>
+        <result column="EstablishDate" jdbcType="VARCHAR" property="establishdate"/>
+        <result column="RegisterMoney" jdbcType="DECIMAL" property="registermoney"/>
+        <result column="EmployeeNumber" jdbcType="INTEGER" property="employeenumber"/>
+        <result column="PhoneNumber" jdbcType="VARCHAR" property="phonenumber"/>
+        <result column="Address" jdbcType="VARCHAR" property="address"/>
+        <result column="MainBusiness" jdbcType="VARCHAR" property="mainbusiness"/>
+        <result column="AreaCode" jdbcType="VARCHAR" property="areacode"/>
+        <result column="Longitude" jdbcType="DECIMAL" property="longitude"/>
+        <result column="Latitude" jdbcType="DECIMAL" property="latitude"/>
+        <result column="InUserSysNo" jdbcType="INTEGER" property="inusersysno"/>
+        <result column="InUserName" jdbcType="VARCHAR" property="inusername"/>
+        <result column="InDate" jdbcType="TIMESTAMP" property="indate"/>
+        <result column="EditUserSysNo" jdbcType="INTEGER" property="editusersysno"/>
+        <result column="EditUserName" jdbcType="VARCHAR" property="editusername"/>
+        <result column="EditDate" jdbcType="TIMESTAMP" property="editdate"/>
+        <result column="ImagePath" jdbcType="VARCHAR" property="imagepath"/>
+        <result column="AreaName" jdbcType="VARCHAR" property="areaname"/>
+        <result column="SupplierStatus" jdbcType="VARCHAR" property="supplierstatus"/>
+        <result column="WebSiteUrl" jdbcType="VARCHAR" property="websiteurl"/>
+        <result column="RepresentPeoplePhone" jdbcType="VARCHAR" property="representpeoplephone"/>
+        <result column="ValidDate" jdbcType="TIMESTAMP" property="validdate"/>
+        <result column="TaxCode" jdbcType="VARCHAR" property="taxcode"/>
+        <result column="FullAreaName" jdbcType="VARCHAR" property="fullareaname"/>
+        <collection property="supplierCreditList" column="SupplierSysNo" ofType="com.yzw.entity.po.SupplierCredit"  select="QuerySupplierCreditUnion">
+
+        </collection>
+    </resultMap>
+    <select id="QuerySupplierList" parameterType="com.yzw.entity.vo.QF_Supplier" resultMap="BaseResultMap"
+            resultType="com.yzw.entity.vo.QR_Supplier">
+        SELECT
+        a.`SysNo` FSysNo,
+        a.`BusinessType`,
+        a.`SupplierSysNo`,
+        a. `SupplierName`,
+        a.`ImagePath`,
+        a.`Type`,
+        a.`SocialCreditNumber`,
+        a.`BizRegisterCode`,
+        a.`OrganizationCode`,
+        a.`RepresentPeopleName`,
+        a.`EstablishDate`,
+        a.`RegisterMoney`,
+        a.`EmployeeNumber`,
+        a.`PhoneNumber`,
+        a.`Address`,
+        a.`MainBusiness`,
+        a.`AreaCode`,
+        a.`Longitude`,
+        a.`Latitude`,
+        a.`InUserSysNo`,
+        a.`InUserName`,
+        a.`InDate`,
+        a.`EditUserSysNo`,
+        a.`EditUserName`,
+        a.`EditDate`,
+        a.`FullAreaName`
+        FROM CreditMgt.supplier a
+        <where>
+            <if test="businessType != null">
+                <![CDATA[
+                a.`BusinessType` = #{businessType}
+                ]]>
+            </if>
+            <if test="mapLeftPoint != null and mapRightPoint!=null">
+                <![CDATA[
+              and  a.`Longitude`> #{mapLeftPoint.longitude}
+               and   a.`Longitude`<= #{mapRightPoint.longitude}
+               and a.latitude>#{mapLeftPoint.latitude}
+                and a.latitude<=#{mapRightPoint.latitude}
+                ]]>
+            </if>
+        </where>
+    </select>
+<select id="QuerySupplierCreditUnion" parameterType="int" resultMap="com.yzw.dao.ISupplierCreditDao.BaseResultMap">
+SELECT     SysNo, SupplierSysNo, Score, ScoreDetail, Date, Level, Trend, InUserSysNo, InUserName,
+    InDate, EditUserSysNo, EditUserName, EditDate, BusinessType, ScoreDate FROM creditmgt.supplier_credit WHERE SupplierSysNo=#{SupplierSysNo}
+</select>
+</mapper>

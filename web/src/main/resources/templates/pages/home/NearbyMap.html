@@ -1,0 +1,684 @@
+<html>
+<div th:replace="fragments/header :: header">
+</div>
+
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=S38Rrmr7bhKTNgXCoBd8fVqWGOKAQdnK&s=1"></script>
+<div id="nearbyMap" class="nearbyMap-wrapper">
+    <div class="nearbyMap-search">
+        <div class="w1200 clear">
+            <div class="fl nearbyMap-tab">
+                <ul>
+                    <li data-bind="click: function() { ViewModel.mainTabChanged(1) },css: {active: showCreditDistibution()==1}">信用分布</li>
+                    <li data-bind="click: function() { ViewModel.mainTabChanged(0) },css: {active: showCreditDistibution()==0}">附近搜索</li>
+                </ul>
+            </div>
+            <div class="fl nearbyMap-item">
+                <ul>
+                    <li data-bind="click: function() { ViewModel.tabChanged(0) },css: {active: selectTabID()==0}">物资分供商</li>
+                    <li data-bind="click: function() { ViewModel.tabChanged(1) },css: {active: selectTabID()==1}">劳务分供商</li>
+                    <li data-bind="click: function() { ViewModel.tabChanged(2) },css: {active: selectTabID()==2}">专业分供商</li>
+                    <li data-bind="click: function() { ViewModel.tabChanged(3) },css: {active: selectTabID()==3}">设备分供商</li>
+                    <li data-bind="click: function() { ViewModel.tabChanged(4) },css: {active: selectTabID()==4}">服务分供商</li>
+                    <li data-bind="visible:showCreditDistibution()==1,click: function() { ViewModel.tabChanged(5) },css: {active: selectTabID()==5}">劳务工人</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="creditDistribution" class="w1200 clear chartMap-wrapper" data-bind="visible:showCreditDistibution()==1">
+        <div class="fl chartMap animated fadeInLeft" id="echatMap"></div>
+        <div class="fl chartMap-list animated fadeInRight">
+
+            <h2 class="title" data-bind="text:creditTopTitle"></h2>
+            <ul data-bind="foreach: creditDataList">
+                <li data-bind="event: { mouseover: function(){ViewModel.creditMouseover($index())}, mouseout: function(){ViewModel.creditMouseOut($index())} }">
+                    <span class="name" data-bind="text: name"></span>
+                    <span class="value" data-bind="text: value"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="nearbySearch" class="w1200 clear map-wrapper" data-bind="visible:showCreditDistibution()==0">
+
+
+
+        <div class="map-list fl animated fadeInLeft">
+            <h2 class="title" data-bind="text:nearbyTopTitle"></h2>
+            <div class="map-list-box">
+                <ul class="active" data-bind="foreach: currentDataList">
+                    <li class="clear" data-bind="event: { mouseover: function(){ViewModel.mapMouseovers($index())}, mouseout: function(){ViewModel.mapMouseout($index())} }">
+                        <div class="item-num fl" data-bind="text:indexStr"></div>
+                        <div class="item-avatar fl">
+                            <img data-bind="attr:{src: '/img/' + pic}" />
+                        </div>
+                        <div class="item-data fl">
+                            <p data-bind="text: name,attr:{title:name}"></p>
+                            <span data-bind="text: credit"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="map-box fr animated fadeInRight">
+            <div id="allmap" class="map"></div>
+
+            <div class="nearbyMap-search-box clear animated fadeInDown" data-bind="visible:showCreditDistibution()==0">
+                <div class="search-label fl">
+                    &emsp;搜索
+                </div>
+                <div class="search-input fl">
+                    <div class="icon fl">
+                        <i class="iconfont icon-sousuo"></i>
+                    </div>
+                    <input id="projectInput" class="fl" placeholder="请输入项目所在地" type="text" data-bind="value:currentProject" />
+                </div>
+                <div class="search-label fl">
+                    附近的
+                </div>
+                <div class="search-input fl">
+                    <div class="icon fl">
+                        <i class="iconfont icon-sousuo"></i>
+                    </div>
+                    <input id="supInput" class="fl" placeholder="请输入供应商关键字" type="text" data-bind="value:currentSupportor" />
+                </div>
+                <div class="search-label fl">
+                    供应商
+                </div>
+                <button class="fr search-btn" data-bind="event: { click: $root.Search}">搜索</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer">
+
+</div>
+</html>
+<script>
+
+    var currentLocation = { lat: 0, lng: 0 };
+    var map = null;
+    var MyScatter = null;
+    var creditDataList = []
+    var closeMoveListen = false;
+
+    var ViewModel = ko.mapping.fromJS({
+        creditDataList: creditDataList,
+        showCreditDistibution: 1,
+        selectTabID: 0,
+        currentDataList: [],
+        currentProject: "",
+        currentSupportor: "",
+        nearbyTopTitle: "附近物资分供商信用排行榜",
+        creditTopTitle: "全国各省、直辖市、自治区企业分供商信用排行（均值）",
+    });
+    ViewModel.creditMouseover = function (index) {
+
+        var item = ViewModel.creditDataList()[index];
+        item.selected = ko.observable(true);;
+        ViewModel.creditDataList.splice(index, 1, item)
+        initCreditDistribution();
+    }
+    ViewModel.creditMouseOut = function (index) {
+
+        var item = ViewModel.creditDataList()[index];
+        item.selected = ko.observable(false);
+        ViewModel.creditDataList.splice(index, 1, item);
+        initCreditDistribution();
+
+    }
+
+
+    ViewModel.mapMouseovers = function (index) {
+
+        closeMoveListen = true;
+        var dataItem = ko.toJS(ViewModel.currentDataList)[index];
+        var id = dataItem.lng + "-" + dataItem.lat + "-" + index;
+        var targetDiv = document.getElementById(id)
+
+        targetDiv.style.background = "url(/img/location-flag-green.png) no-repeat";
+        targetDiv.style.backgroundSize = "50%"
+        document.getElementById("tip" + "-" + id).style.visibility = "visible";
+        map.panTo(new BMap.Point(dataItem.lng, dataItem.lat))
+
+    }
+    ViewModel.mapMouseout = function (index) {
+
+        closeMoveListen = false;
+        var dataItem = ko.toJS(ViewModel.currentDataList)[index];
+        var id = dataItem.lng + "-" + dataItem.lat + "-" + index;
+        var targetDiv = document.getElementById(id)
+
+        targetDiv.style.background = "url(/img/location-flag-red.png) no-repeat";
+        targetDiv.style.backgroundSize = "50%"
+        document.getElementById("tip" + "-" + id).style.visibility = "hidden";
+    }
+
+
+    ViewModel.mainTabChanged = function (event) {
+        ViewModel.showCreditDistibution(event)
+        if (event == 0) {
+            ViewModel.initMapInfo();
+        }
+    }
+
+    ViewModel.tabChanged = function (event) {
+        ViewModel.selectTabID(event)
+
+        switch (event) {
+            case 0:
+
+                ViewModel.nearbyTopTitle("附近物资分供商信用排行榜")
+                ViewModel.creditTopTitle("全国各省、直辖市、自治区企业物资分供商信用排行（均值）")
+
+                break;
+            case 1:
+                ViewModel.nearbyTopTitle("附近劳务分供商信用排行榜")
+                ViewModel.creditTopTitle("全国各省、直辖市、自治区企业劳务分供商信用排行（均值）")
+
+                break;
+            case 2:
+                ViewModel.nearbyTopTitle("附近专业分供商信用排行榜")
+                ViewModel.creditTopTitle("全国各省、直辖市、自治区专业分供商信用排行（均值）")
+                break;
+            case 3:
+                ViewModel.nearbyTopTitle("附近设备分供商信用排行榜")
+                ViewModel.creditTopTitle("全国各省、直辖市、自治区设备分供商信用排行（均值）")
+                break;
+            case 4:
+                ViewModel.nearbyTopTitle("附近服务分供商信用排行榜")
+                ViewModel.creditTopTitle("全国各省、直辖市、自治区服务分供商信用排行（均值）")
+                break;
+            default:
+                break;
+        }
+
+        if (ViewModel.showCreditDistibution() == 1) {
+            rekoadCreditData();
+            initCreditDistribution();
+        }
+        //else if (ViewModel.showCreditDistibution() == 0) {
+        //    search();
+        //}
+        ViewModel.LoadMapData();
+    };
+
+    function rekoadCreditData() {
+
+        var creditDataList = [
+            { name: '北京', value: randomValue() },
+            { name: '天津', value: randomValue() },
+            { name: '上海', value: randomValue() },
+            { name: '重庆', value: randomValue() },
+            { name: '河北', value: randomValue() },
+            { name: '河南', value: randomValue() },
+            { name: '云南', value: randomValue() },
+            { name: '辽宁', value: randomValue() },
+            { name: '黑龙江', value: randomValue() },
+            { name: '湖南', value: randomValue() },
+            { name: '安徽', value: randomValue() },
+            { name: '山东', value: randomValue() },
+            { name: '新疆', value: randomValue() },
+            { name: '江苏', value: randomValue() },
+            { name: '浙江', value: randomValue() },
+            { name: '江西', value: randomValue() },
+            { name: '湖北', value: randomValue() },
+            { name: '广西', value: randomValue() },
+            { name: '甘肃', value: randomValue() },
+            { name: '山西', value: randomValue() },
+            { name: '内蒙古', value: randomValue() },
+            { name: '陕西', value: randomValue() },
+            { name: '吉林', value: randomValue() },
+            { name: '福建', value: randomValue() },
+            { name: '贵州', value: randomValue() },
+            { name: '广东', value: randomValue() },
+            { name: '青海', value: randomValue() },
+            { name: '西藏', value: randomValue() },
+            { name: '四川', value: randomValue() },
+            { name: '宁夏', value: randomValue() },
+            { name: '海南', value: randomValue() },
+            { name: '台湾', value: randomValue() },
+            { name: '香港', value: randomValue() },
+            { name: '澳门', value: randomValue() }
+        ]
+        creditDataList = creditDataList.sort(function (a, b)
+        { return b.value - a.value; })
+
+        ViewModel.creditDataList.removeAll();
+        for (var i = 0; i < creditDataList.length; i++) {
+            var item = creditDataList[i];
+            ViewModel.creditDataList.push(item);
+        }
+    }
+
+    ViewModel.initMapInfo = function () {
+        var me = this;
+        if (map == null) {
+            map = new BMap.Map("allmap");
+            map.enableScrollWheelZoom(true);
+            map.enableDragging();
+        }
+
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                map.centerAndZoom(new BMap.Point(r.point.lng, r.point.lat), 15);
+                currentLocation = r.point;
+            }
+            else {
+                alert('failed' + this.getStatus());
+            }
+        }, { enableHighAccuracy: true })
+
+        map.addEventListener("tilesloaded", function (e) {
+            if (!closeMoveListen) {
+                currentLocation = map.getCenter();
+                search();
+            }
+        });
+
+
+
+        //拖拽事件
+        map.addEventListener("dragend", function showInfo() {
+            //var bs = map.getBounds();   //获取可视区域
+            //var bssw = bs.getSouthWest();   //可视区域左下角
+            //var bsne = bs.getNorthEast();   //可视区域右上角
+            ////alert("当前地图可视范围是：" + bssw.lng + "," + bssw.lat + "到" + bsne.lng + "," + bsne.lat);
+            //var filter = me.getFilter();
+            //filter.MapLeftPoint.Longitude = bssw.lng;
+            //filter.MapLeftPoint.Latitude = bssw.lat;
+            //filter.MapRightPoint.Longitude = bsne.lng;
+            //filter.MapRightPoint.Latitude = bsne.lat;
+            me.LoadMapData();
+
+        });
+        //缩放事件
+        map.addEventListener("zoomend", function showInfo() {
+            //var bs = map.getBounds();   //获取可视区域
+            //var bssw = bs.getSouthWest();   //可视区域左下角
+            //var bsne = bs.getNorthEast();   //可视区域右上角
+            ////alert("当前地图可视范围是：" + bssw.lng + "," + bssw.lat + "到" + bsne.lng + "," + bsne.lat);
+            //var filter = me.getFilter();
+            //filter.MapLeftPoint.Longitude = bssw.lng;
+            //filter.MapLeftPoint.Latitude = bssw.lat;
+            //filter.MapRightPoint.Longitude = bsne.lng;
+            //filter.MapRightPoint.Latitude = bsne.lat;
+            me.LoadMapData();
+        });
+
+    }
+    ViewModel.addMarker = function (point, item) {
+        var marker = new BMap.Marker(point);
+        var label = new BMap.Label(item.SupplierName, { offset: new BMap.Size(20, -10) });
+        marker.setLabel(label);
+        map.addOverlay(marker);
+        marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+    }
+    ViewModel.getFilter = function () {
+        var bs = map.getBounds();   //获取可视区域
+        var bssw = bs.getSouthWest();   //可视区域左下角
+        var bsne = bs.getNorthEast();   //可视区域右上角
+
+        var filter = {};
+        filter.mapLeftPoint = {};
+        filter.mapRightPoint = {};
+        filter.businessType = ViewModel.selectTabID;
+        filter.supplierName = ViewModel.currentSupportor();
+
+        filter.mapLeftPoint.longitude = bssw.lng;
+        filter.mapLeftPoint.latitude = bssw.lat;
+        filter.mapRightPoint.longitude = bsne.lng;
+        filter.mapRightPoint.latitude = bsne.lat;
+        return filter;
+    }
+    ViewModel.LoadMapData = function () {
+        var me = this;
+        var filter = me.getFilter();
+        $.ajax({
+            url: '/Home/QueryNearByMap',
+            contentType: "application/json;charset=UTF-8",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(filter),
+            success: function (resp) {
+                if (resp.success === true) {
+                    //map.clearOverlays();
+                    //for (var i in data.Data) {
+                    //    var item = data.Data[i];
+                    //    var point = new BMap.Point(item.Longitude, item.Latitude);
+                    //    me.addMarker(point, item);
+                    //}
+                    me.CreateOverLay(resp.data.list);
+                } else {
+
+                }
+            }
+        });
+    }
+    ViewModel.CreateOverLay = function (Data) {
+        ViewModel.currentDataList.removeAll();
+        for (var i in Data) {
+            var item = Data[i];
+            var info = {
+                lng: item.longitude,
+                lat: item.latitude
+            }
+            info.name = item.supplierName;//ViewModel.currentProject() + ViewModel.currentSupportor() + i;
+            info.credit =item.recentSupplierCredit!=null&&item.recentSupplierCredit!=undefined?item.recentSupplierCredit.score:"";
+            info.indexStr =parseInt(i)+1;//(Array(2).join('0') + (nameList.length + 1 - i)).slice(-2);
+            info.distanceStr = "";
+            info.pic = item.imagePath != null && item.imagePath.length > 0 ? item.imagePath : "1-avatar.jpg";
+            ViewModel.currentDataList.push(info);
+        }
+        for (var i = 0; i < ViewModel.currentDataList().length; i++) {
+            var item = ViewModel.currentDataList()[i];
+            createCustomOverlay(new BMap.Point(item.lng, item.lat), item.name, item.distanceStr, i);
+        }
+
+    }
+
+    ViewModel.Search=function()
+    {
+        var me = this;
+        map.clearOverlays();
+        ViewModel.currentDataList.removeAll();
+        if (ViewModel.currentProject() == "" && ViewModel.currentSupportor() == "") {
+            return;
+        }
+        // 创建地址解析器实例
+        var myGeo = new BMap.Geocoder();
+        // 将地址解析结果显示在地图上,并调整地图视野
+        myGeo.getPoint(ViewModel.currentProject().trim(), function (point) {
+            if (point) {
+                map.centerAndZoom(point, 12);
+                //map.addOverlay(new BMap.Marker(point));
+            } else {
+                alert("您选择地址没有解析到结果!");
+            }
+        }, "北京市");
+        //var filter = me.getFilter();
+        //filter.BusinessType = null;
+        //filter.SupplierName = ViewModel.currentSupportor();
+
+    }
+
+
+
+
+
+
+    //function reloadData() {
+
+    //    var nameInfo = [[
+    //        "武汉顺和建筑工程有限公司",
+    //        "湖北鼎臣防水隔热工程有限公司",
+    //        "武汉天艺成建筑新技术有限公司",
+    //        "武汉平昌鑫华建筑劳务有限公司",
+    //        "湖北鄂海桩基工程有限公司",
+    //        "湖北安和机电工程有限公司",
+    //        "上海泰冉建筑劳务有限公司",
+    //        "河南杭萧钢构有限公司",
+    //        "武汉宏宇建设工程咨询有限公司",
+    //        "武汉光谷建设投资有限公司",
+    //        "湖北省科学技术馆",
+    //        "中建三局工程总承包公司",
+    //        "中建三局工程总承包公司机电设备公司",
+    //        "武汉桓宇科技物业发展有限公司",
+    //        "山东省城乡建设勘察设计研究院"
+    //    ],
+    //    [
+    //        "北京东方永盛保温材料厂",
+    //        "武汉兴帮水电安装有限公司",
+    //        "河南恒丰劳务有限公司",
+    //        "江西绿地悦公馆",
+    //        "武汉力神建筑劳务有限公司",
+    //        "武汉天蝎装备建筑公司",
+    //        "武汉顺和建筑工程有限公司",
+    //        "鄂州长丰建筑劳务有限公司",
+    //        "晟通铝膜",
+    //        "兴邦水电安装",
+    //        "津新源",
+    //        "联投置业有限公司",
+    //        "湖北南方建设咨询有限公司",
+    //        "东方精创"
+    //    ]]
+    //    var nameList = nameInfo[ViewModel.selectTabID() % 2];
+    //    var list = []
+    //    var imgArr = ["1-avatar.jpg", "2-avatar.jpg", "1-bg-avatar.jpg", "2-bg-avatar.jpg", "3-bg-avatar.jpg",
+    //                "1-avatar.jpg", "2-avatar.jpg", "1-bg-avatar.jpg", "2-bg-avatar.jpg", "3-bg-avatar.jpg",
+    //                "1-avatar.jpg", "2-avatar.jpg", "1-bg-avatar.jpg", "2-bg-avatar.jpg", "3-bg-avatar.jpg", "1-avatar.jpg"]
+    //    for (var i = nameList.length; i > 0; i--) {
+
+    //        var r = Math.random();
+    //        var angle = Math.random() * 360
+
+    //        var info = {
+    //            lng: currentLocation.lng + r * Math.sin(angle * Math.PI / 180) * 0.02,
+    //            lat: currentLocation.lat + r * Math.cos(angle * Math.PI / 180) * 0.03
+    //        }
+    //        info.name = nameList[i - 1];//ViewModel.currentProject() + ViewModel.currentSupportor() + i;
+    //        info.credit = i * 50 + (i - 1) * 2 + i - 2
+    //        info.indexStr = (Array(2).join('0') + (nameList.length + 1 - i)).slice(-2);
+    //        info.distanceStr = i * i + 'km';
+    //        info.pic = imgArr[i];
+    //        ViewModel.currentDataList.push(info);
+    //    }
+
+
+
+
+
+    //    for (var i = 0; i < ViewModel.currentDataList().length; i++) {
+    //        var item = ViewModel.currentDataList()[i];
+    //        createCustomOverlay(new BMap.Point(item.lng, item.lat), item.name, item.distanceStr)
+    //    }
+    //};
+
+
+
+    function createCustomOverlay(point, detailText1, detailText2,i) {
+
+        // 复杂的自定义覆盖物
+        function ComplexCustomOverlay(point, detailText1, detailText2) {
+            this._point = point;
+            this._detailText1 = detailText1;
+            this._detailText2 = detailText2;
+        }
+        ComplexCustomOverlay.prototype = new BMap.Overlay();
+        ComplexCustomOverlay.prototype.initialize = function (mp) {
+            this._map = mp;
+            var div = this._div = document.createElement("div");
+            div.style.position = "absolute";
+            div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+            div.style.width = "28px";
+            div.style.height = "36px";
+            div.style.padding = "2px";
+            div.style.MozUserSelect = "none";
+            div.style.background = "url(/img/location-flag-red.png) no-repeat";
+            div.style.backgroundSize = "50%"
+            div.id = this._point.lng + '-' + this._point.lat + "-" + i;
+
+
+
+            var tipDiv = this._tipDiv = document.createElement("div");
+            tipDiv.style.position = "absolute";
+            tipDiv.style.bottom = "36px";
+            tipDiv.style.left = "-7px";
+            tipDiv.id = "tip" + "-" + this._point.lng + '-' + this._point.lat+"-"+i;
+            div.appendChild(tipDiv);
+
+
+            var textDiv = document.createElement("div");
+            textDiv.style.color = "white";
+            textDiv.style.paddingLeft = "12px";
+            textDiv.style.paddingRight = "12px";
+            textDiv.style.paddingTop = "8px";
+            textDiv.style.paddingBottom = "8px";
+            textDiv.style.lineHeight = "18px";
+            textDiv.style.whiteSpace = "nowrap";
+            textDiv.style.fontSize = "12px"
+            textDiv.style.backgroundColor = "#3AAF70";
+            textDiv.style.borderRadius = "1px";
+            textDiv.style.boxShadow = "0 2px 3px 0 ";
+            textDiv.style.textAlign = "center";
+            tipDiv.appendChild(textDiv);
+
+            var span = this._span = document.createElement("span");
+            textDiv.appendChild(span);
+            span.appendChild(document.createTextNode(this._detailText1 + "  " + this._detailText2));
+
+
+            var arrow = this._arrow = document.createElement("div");
+            arrow.style.background = "url(/img/arrow_dow_green.png) no-repeat";
+            arrow.style.backgroundSize = "50%"
+            arrow.style.width = "16px";
+            arrow.style.height = "8px";
+            arrow.style.overflow = "hidden";
+            arrow.style.marginLeft = "10px";
+            tipDiv.appendChild(arrow);
+
+
+
+
+
+            tipDiv.style.visibility = "hidden";
+
+            div.onmouseover = function () {
+                this.style.background = "url(/img/location-flag-green.png) no-repeat";
+                this.style.backgroundSize = "50%"
+                tipDiv.style.visibility = "visible";
+            }
+
+            div.onmouseout = function () {
+                this.style.background = "url(/img/location-flag-red.png) no-repeat";
+                this.style.backgroundSize = "50%"
+                tipDiv.style.visibility = "hidden";
+            }
+
+            map.getPanes().labelPane.appendChild(div);
+            return div;
+        }
+        ComplexCustomOverlay.prototype.draw = function () {
+            var mp = this._map;
+            var pixel = mp.pointToOverlayPixel(this._point);
+            this._div.style.left = pixel.x + "px";
+            this._div.style.top = pixel.y + "px";
+        }
+
+        var myCompOverlay = new ComplexCustomOverlay(point, detailText1, detailText2);
+
+        map.addOverlay(myCompOverlay);
+    }
+
+    function search() {
+
+        //map.clearOverlays();
+        //ViewModel.currentDataList.removeAll();
+        //if (ViewModel.currentProject() == "" && ViewModel.currentSupportor() == "") {
+        //    return;
+        //}
+        //reloadData()
+
+    }
+
+    //信用分布
+
+    function randomValue() {
+        return Math.round(Math.random() * 800);
+    }
+
+
+    function initCreditDistribution() {
+
+        if (MyScatter == null) {
+            MyScatter = echarts.init(document.getElementById('echatMap'));
+        }
+
+        var option = {
+            tooltip: {},
+            visualMap: {
+                show: true,
+                min: 0,
+                max: 800,
+                left: 'left',
+                top: 'bottom',
+                text: ['高', '低'],
+                seriesIndex: [1],
+                textStyle: {
+                    color: '#fff'
+                },
+                inRange: {
+                    color: ['#A2D8E0', '#54A8D8']
+                },
+                calculable: true
+            },
+            series: [
+                {
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                },
+                {
+                    name: '信用值',
+                    type: 'map',
+                    map: 'china',
+                    roam: false,
+                    left: 0,
+                    right: 30,
+                    label: {
+                        normal: {
+                            show: false,
+                        },
+                        emphasis: {
+                            show: false,
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: '#fff'
+                        },
+                        emphasis: {
+                            areaColor: null,
+                            shadowOffsetX: 0,
+                            shadowOffsetY: 0,
+                            shadowBlur: 20,
+                            borderWidth: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)',
+                            color: '#50D28C',
+                        }
+                    },
+                    data: ko.toJS(ViewModel.creditDataList)
+                }
+            ]
+        }
+
+        MyScatter.setOption(option);
+    }
+
+
+
+
+    $(function () {
+
+        ko.applyBindings(ViewModel, document.getElementById('nearbyMap'));
+        rekoadCreditData();
+        initCreditDistribution();
+
+
+    });
+
+    //设置内容高度
+    function setContentHeight() {
+        var cHeight = $(window).outerHeight(); //窗口高度
+        var topHeight = $(".header-wrapper").outerHeight(); //头部高度
+        var bottomHeight = $(".footer-wrapper").outerHeight(); //底部高度
+        var centerHeight = $(".nearbyMap-wrapper").outerHeight(); //内容高度
+        var contentHeight = cHeight - topHeight - bottomHeight - centerHeight;
+
+        if (contentHeight > 0) {
+            $(".nearbyMap-wrapper").css("min-height", contentHeight);
+        }
+    }
+    window.onload = function () { setContentHeight(); }
+    window.onresize = function () { setContentHeight(); }
+</script>

@@ -1,0 +1,39 @@
+
+<div th:fragment="header" th:remove="tag" xmlns:th="http://www.w3.org/1999/xhtml">
+
+    <link th:href="@{'/css/header.css'}" rel="stylesheet"></link>
+    <link href="/css/reset.css?v=1.0.7" rel="stylesheet" />
+    <link href="/css/base.css?v=1.0.7" rel="stylesheet" />
+    <link href="/css/iconfont.css?v=1.0.7" rel="stylesheet" />
+    <link href="/css/animate.min.css?v=1.0.7" rel="stylesheet" />
+    <link href="/css/index.css?v=1.0.7" rel="stylesheet" />
+
+    <div class="header-wrapper">
+    <div class="w1200 clear">
+        <div class="logo fl">
+            <a href='/Home/index'><img src="/img/logo.png" /></a>
+        </div>
+        <div class="nav fl">
+            <ul>
+                <li>
+                    <a href='/Home/NearbyMap' title="信用地图">信用地图</a>
+                </li>
+                <li>
+                    <a href='/Home/Company' title="企业信用">企业信用</a>
+                </li>
+                <li>
+                    <a href='/Home/Person' title="个人信用">个人信用</a>
+                </li>
+            </ul>
+        </div>
+        <div class="login-reg fr">
+
+            <a href="javascript:;" id="login" title="登录">登录</a>
+            <span>|</span>
+            <a href="javascript:;" id="register" title="注册">注册</a>
+
+        </div>
+    </div>
+</div>
+
+    </div>

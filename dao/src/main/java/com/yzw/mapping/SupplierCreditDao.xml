@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yzw.dao.ISupplierCreditDao">
+  <resultMap id="BaseResultMap" type="com.yzw.entity.po.SupplierCredit">
+    <id column="SysNo" jdbcType="INTEGER" property="sysno" />
+    <result column="SupplierSysNo" jdbcType="INTEGER" property="suppliersysno" />
+    <result column="Score" jdbcType="DECIMAL" property="score" />
+    <result column="ScoreDetail" jdbcType="VARCHAR" property="scoredetail" />
+    <result column="Date" jdbcType="TIMESTAMP" property="date" />
+    <result column="Level" jdbcType="INTEGER" property="level" />
+    <result column="Trend" jdbcType="INTEGER" property="trend" />
+    <result column="InUserSysNo" jdbcType="INTEGER" property="inusersysno" />
+    <result column="InUserName" jdbcType="VARCHAR" property="inusername" />
+    <result column="InDate" jdbcType="TIMESTAMP" property="indate" />
+    <result column="EditUserSysNo" jdbcType="INTEGER" property="editusersysno" />
+    <result column="EditUserName" jdbcType="VARCHAR" property="editusername" />
+    <result column="EditDate" jdbcType="TIMESTAMP" property="editdate" />
+    <result column="BusinessType" jdbcType="INTEGER" property="businesstype" />
+    <result column="ScoreDate" jdbcType="TIMESTAMP" property="scoredate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    SysNo, SupplierSysNo, Score, ScoreDetail, Date, Level, Trend, InUserSysNo, InUserName, 
+    InDate, EditUserSysNo, EditUserName, EditDate, BusinessType, ScoreDate
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from creditmgt..supplier_credit
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from creditmgt..supplier_credit
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yzw.entity.po.SupplierCredit">
+    insert into creditmgt..supplier_credit (SysNo, SupplierSysNo, Score, 
+      ScoreDetail, Date, Level, 
+      Trend, InUserSysNo, InUserName, 
+      InDate, EditUserSysNo, EditUserName, 
+      EditDate, BusinessType, ScoreDate
+      )
+    values (#{sysno,jdbcType=INTEGER}, #{suppliersysno,jdbcType=INTEGER}, #{score,jdbcType=DECIMAL}, 
+      #{scoredetail,jdbcType=VARCHAR}, #{date,jdbcType=TIMESTAMP}, #{level,jdbcType=INTEGER}, 
+      #{trend,jdbcType=INTEGER}, #{inusersysno,jdbcType=INTEGER}, #{inusername,jdbcType=VARCHAR}, 
+      #{indate,jdbcType=TIMESTAMP}, #{editusersysno,jdbcType=INTEGER}, #{editusername,jdbcType=VARCHAR}, 
+      #{editdate,jdbcType=TIMESTAMP}, #{businesstype,jdbcType=INTEGER}, #{scoredate,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yzw.entity.po.SupplierCredit">
+    insert into creditmgt..supplier_credit
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="sysno != null">
+        SysNo,
+      </if>
+      <if test="suppliersysno != null">
+        SupplierSysNo,
+      </if>
+      <if test="score != null">
+        Score,
+      </if>
+      <if test="scoredetail != null">
+        ScoreDetail,
+      </if>
+      <if test="date != null">
+        Date,
+      </if>
+      <if test="level != null">
+        Level,
+      </if>
+      <if test="trend != null">
+        Trend,
+      </if>
+      <if test="inusersysno != null">
+        InUserSysNo,
+      </if>
+      <if test="inusername != null">
+        InUserName,
+      </if>
+      <if test="indate != null">
+        InDate,
+      </if>
+      <if test="editusersysno != null">
+        EditUserSysNo,
+      </if>
+      <if test="editusername != null">
+        EditUserName,
+      </if>
+      <if test="editdate != null">
+        EditDate,
+      </if>
+      <if test="businesstype != null">
+        BusinessType,
+      </if>
+      <if test="scoredate != null">
+        ScoreDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="sysno != null">
+        #{sysno,jdbcType=INTEGER},
+      </if>
+      <if test="suppliersysno != null">
+        #{suppliersysno,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="scoredetail != null">
+        #{scoredetail,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="trend != null">
+        #{trend,jdbcType=INTEGER},
+      </if>
+      <if test="inusersysno != null">
+        #{inusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="inusername != null">
+        #{inusername,jdbcType=VARCHAR},
+      </if>
+      <if test="indate != null">
+        #{indate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editusersysno != null">
+        #{editusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="editusername != null">
+        #{editusername,jdbcType=VARCHAR},
+      </if>
+      <if test="editdate != null">
+        #{editdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="businesstype != null">
+        #{businesstype,jdbcType=INTEGER},
+      </if>
+      <if test="scoredate != null">
+        #{scoredate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yzw.entity.po.SupplierCredit">
+    update creditmgt..supplier_credit
+    <set>
+      <if test="suppliersysno != null">
+        SupplierSysNo = #{suppliersysno,jdbcType=INTEGER},
+      </if>
+      <if test="score != null">
+        Score = #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="scoredetail != null">
+        ScoreDetail = #{scoredetail,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        Date = #{date,jdbcType=TIMESTAMP},
+      </if>
+      <if test="level != null">
+        Level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="trend != null">
+        Trend = #{trend,jdbcType=INTEGER},
+      </if>
+      <if test="inusersysno != null">
+        InUserSysNo = #{inusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="inusername != null">
+        InUserName = #{inusername,jdbcType=VARCHAR},
+      </if>
+      <if test="indate != null">
+        InDate = #{indate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editusersysno != null">
+        EditUserSysNo = #{editusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="editusername != null">
+        EditUserName = #{editusername,jdbcType=VARCHAR},
+      </if>
+      <if test="editdate != null">
+        EditDate = #{editdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="businesstype != null">
+        BusinessType = #{businesstype,jdbcType=INTEGER},
+      </if>
+      <if test="scoredate != null">
+        ScoreDate = #{scoredate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yzw.entity.po.SupplierCredit">
+    update creditmgt..supplier_credit
+    set SupplierSysNo = #{suppliersysno,jdbcType=INTEGER},
+      Score = #{score,jdbcType=DECIMAL},
+      ScoreDetail = #{scoredetail,jdbcType=VARCHAR},
+      Date = #{date,jdbcType=TIMESTAMP},
+      Level = #{level,jdbcType=INTEGER},
+      Trend = #{trend,jdbcType=INTEGER},
+      InUserSysNo = #{inusersysno,jdbcType=INTEGER},
+      InUserName = #{inusername,jdbcType=VARCHAR},
+      InDate = #{indate,jdbcType=TIMESTAMP},
+      EditUserSysNo = #{editusersysno,jdbcType=INTEGER},
+      EditUserName = #{editusername,jdbcType=VARCHAR},
+      EditDate = #{editdate,jdbcType=TIMESTAMP},
+      BusinessType = #{businesstype,jdbcType=INTEGER},
+      ScoreDate = #{scoredate,jdbcType=TIMESTAMP}
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,140 @@
+﻿@charset "utf-8";
+html.ie8{
+    font-size:14px;/*px换算成rem*/
+}
+html.ie8,
+.ie8 body {
+    min-width: 1200px;
+}
+.ie8 .loading-block .loading-message{
+    height: 56px;
+    line-height: 56px;
+}
+.ie8 .section{
+    min-width:1200px;
+}
+.ie8 .section.content{
+    padding:20px;
+    margin-bottom:20px;
+}
+.ie8 .w120{
+    width:120px !important;
+}
+.ie8 .w140{
+    width:140px !important;
+}
+.ie8 .w190{
+    width:190px !important;
+}
+.ie8 .pr10{
+    padding-right:10px;
+}
+.ie8 .pr25{
+    padding-right:25px;
+}
+.ie8 .pt20{
+    padding-top:20px;
+}
+.ie8 .p20 {
+    padding: 20px !important;
+}
+.ie8 .p10 {
+    padding: 10px !important;
+}
+.ie8 .pb10{
+    padding-bottom:10px;
+}
+.ie8 .pb20{
+    padding-bottom:20px !important;
+}
+.ie8 .pl_10 {
+    padding-left: 10px !important;
+}
+.ie8 .pl40{
+    padding-left:40px;
+}
+.ie8 .mr5{
+    margin-right:5px;
+}
+.ie8 .m5{
+    margin:5px;
+}
+.ie8 .mr10{
+    margin-right:10px;
+}
+.ie8 .mr13{
+    margin-right:13px;
+}
+.ie8 .mr16{
+    margin-right:16px;
+}
+.ie8 .mr40{
+    margin-right:40px;
+}
+.ie8 .mt30{
+    margin-top:30px;
+}
+.ie8 .mr56{
+    margin-right:56px;
+}
+.ie8 .mb10{
+    margin-bottom:10px;
+}
+.ie8 .mb15{
+    margin-bottom:15px;
+}
+.ie8 .mb20{
+    margin-bottom:20px;
+}
+.ie8 .mb40{
+    margin-bottom:40px !important;
+}
+.ie8 .mt10{
+    margin-top:10px;
+}
+.ie8 .mt20{
+    margin-top:20px;
+}
+.ie8 .mt40{
+    margin-top:40px;
+}
+.ie8 .mt50{
+    margin-top:50px;
+}
+.ie8 .ml10{
+    margin-left:10px;
+}
+.ie8 .ml40{
+    margin-left:40px;
+}
+.ie8 .input-border{
+    border:1px solid #dedede;
+}
+.ie8 .border-bottom-dotted{
+    border-bottom:1px dotted #eeeeee;
+}
+.ie8 .th-border-left{
+    border-left:1px solid #e8e8e8;
+}
+.ie8 .th-border-right{
+    border-right:1px solid #e8e8e8;
+}
+/*字体大小*/
+.ie8 .ft_20{
+    font-size:20px;
+}
+.ie8 .ft_18{
+    font-size:18px;
+}
+.ie8 .ft_16{
+    font-size:16px;
+}
+.ie8 .ft_14{
+    font-size:14px;
+}
+.ie8 .ft_12{
+    font-size:12px;
+}
+.ie8 .lh40{
+    line-height:40px !important;
+}

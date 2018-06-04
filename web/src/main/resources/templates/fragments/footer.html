@@ -1,0 +1,101 @@
+<html>
+<body>
+<div th:fragment="footer" th:remove="tag" xmlns:th="http://www.w3.org/1999/xhtml">
+    <link href="/css/footer.css?v=1.0.4" rel="stylesheet" />
+    <div class="footer-wrapper">
+        <div class="w1200 clear">
+            <div class="link-wrapper fl">
+                <ul>
+                    <li>
+                        <a href="https://jc.yzw.cn/" target="_blank" title="云筑集采">云筑集采</a>
+                    </li>
+                    <li>
+                        <a href="https://mall.yzw.cn/" target="_blank" title="云筑商城">云筑商城</a>
+                    </li>
+                    <li>
+                        <a href="https://lw.yzw.cn/" target="_blank" title="云筑劳务">云筑劳务</a>
+                    </li>
+                    <li>
+                        <a href="https://jf.yzw.cn/" target="_blank" title="云筑金服">云筑金服</a>
+                    </li>
+                    <li>
+                        <a href="https://ibuild.yzw.cn/" target="_blank" title="云筑智联">云筑智联</a>
+                    </li>
+                    <li>
+                        <a href="https://www.yzw.cn/home/cooperation" target="_blank" title="合作洽谈">合作洽谈</a>
+                    </li>
+                    <li>
+                        <a href="https://www.yzw.cn/home/contactus" target="_blank" title="联系我们">联系我们</a>
+                    </li>
+                </ul>
+                <div class="site-info">
+                    <p>蜀ICP备15020860号-1&emsp;&emsp;客服电话 400-100-3022</p>
+                </div>
+            </div>
+            <div class="weixin-box fr">
+                <div class="weixin-img fl">
+                    <img src="/img/weixin.jpg" />
+                </div>
+                <div class="weixin-info fl">
+                    <h3>云筑网官方微信</h3>
+                    <p>微信扫描二维码或</p>
+                    <p>搜索公众号云筑网</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/js/third/jquery-1.12.1.min.js"></script>
+    <script type="text/javascript" src="/js/third/jquery-extension.js?v=1.0.7"></script>
+    <script type="text/javascript" src="/js/third/parallax/jquery.parallax.js"></script>
+    <script type="text/javascript" src="/js/third/echart/echarts.common.min.js"></script>
+    <script type="text/javascript" src="/js/third/echart/echarts.min.js"></script>
+    <script type="text/javascript" src="/js/third/echart/china.js"></script>
+    <script type="text/javascript" src="/js/third/knockout/knockout.js"></script>
+    <script type="text/javascript" src="/js/third/knockout/knockout.extend.js"></script>
+    <script type="text/javascript" src="/js/third/knockout/ko.mapping.js"></script>
+    <script type="text/javascript" src="/js/third/jquery.SuperSlide.2.1.1.js"></script>
+    <script type="text/javascript" src="/js/third/blockui/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="/js/third/UI.base.js?v=1.0.7"></script>
+    <script type="text/javascript">
+        $(function () {
+            //临时处理菜单样式选中
+            var str = window.location.pathname;
+            var index = str.lastIndexOf("\/");
+            str = str.substring(index + 1, str.length);
+            switch (str) {
+                case 'NearbyMap':
+                    $(".header-wrapper .nav li").eq(0).addClass('active');
+                    break;
+                case 'Company':
+                    $(".header-wrapper .nav li").eq(1).addClass('active');
+                    break;
+                case 'CompanyDetails':
+                    $(".header-wrapper .nav li").eq(1).addClass('active');
+                    break;
+                case 'Person':
+                    $(".header-wrapper .nav li").eq(2).addClass('active');
+                    break;
+                case 'PersonDetails':
+                    $(".header-wrapper .nav li").eq(2).addClass('active');
+                    break;
+                default:
+                    break;
+            }
+
+            //登录&注册
+            $('#login').click(function () {
+                LoginPicker.show();
+            })
+
+            $('#register').click(function () {
+                RegPicker.show();
+            })
+
+            $('#loginout').click(function () {
+                _logout();
+            })
+        })
+    </script>
+</div>
+</body>
+</html>

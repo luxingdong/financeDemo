@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yzw.dao.UserDao">
+  <resultMap id="BaseResultMap" type="com.yzw.entity.po.User">
+    <id column="SysNo" jdbcType="INTEGER" property="sysno" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Password" jdbcType="VARCHAR" property="password" />
+    <result column="CellPhone" jdbcType="VARCHAR" property="cellphone" />
+    <result column="Status" jdbcType="INTEGER" property="status" />
+    <result column="InUserSysNo" jdbcType="INTEGER" property="inusersysno" />
+    <result column="InUserName" jdbcType="VARCHAR" property="inusername" />
+    <result column="InDate" jdbcType="TIMESTAMP" property="indate" />
+    <result column="EditUserSysNo" jdbcType="INTEGER" property="editusersysno" />
+    <result column="EditUserName" jdbcType="VARCHAR" property="editusername" />
+    <result column="EditDate" jdbcType="TIMESTAMP" property="editdate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    SysNo, Name, Password, CellPhone, Status, InUserSysNo, InUserName, InDate, EditUserSysNo, 
+    EditUserName, EditDate
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from creditmgt.user
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByFilter" parameterType="com.yzw.entity.vo.QF_User" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from creditmgt.user
+    <where>
+      <if test="name != null">
+        AND Name=#{name}
+      </if>
+      <if test="password != null">
+        and Password=#{password}
+      </if>
+
+    </where>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from creditmgt.user
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.yzw.entity.po.User">
+    <selectKey keyProperty="sysno" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into creditmgt.user (Name, Password, CellPhone,
+      Status, InUserSysNo, InUserName, 
+      InDate, EditUserSysNo, EditUserName, 
+      EditDate)
+    values (#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{cellphone,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{inusersysno,jdbcType=INTEGER}, #{inusername,jdbcType=VARCHAR}, 
+      #{indate,jdbcType=TIMESTAMP}, #{editusersysno,jdbcType=INTEGER}, #{editusername,jdbcType=VARCHAR}, 
+      #{editdate,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.yzw.entity.po.User">
+    <selectKey keyProperty="sysno" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into creditmgt.user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        Name,
+      </if>
+      <if test="password != null">
+        Password,
+      </if>
+      <if test="cellphone != null">
+        CellPhone,
+      </if>
+      <if test="status != null">
+        Status,
+      </if>
+      <if test="inusersysno != null">
+        InUserSysNo,
+      </if>
+      <if test="inusername != null">
+        InUserName,
+      </if>
+      <if test="indate != null">
+        InDate,
+      </if>
+      <if test="editusersysno != null">
+        EditUserSysNo,
+      </if>
+      <if test="editusername != null">
+        EditUserName,
+      </if>
+      <if test="editdate != null">
+        EditDate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="cellphone != null">
+        #{cellphone,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="inusersysno != null">
+        #{inusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="inusername != null">
+        #{inusername,jdbcType=VARCHAR},
+      </if>
+      <if test="indate != null">
+        #{indate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editusersysno != null">
+        #{editusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="editusername != null">
+        #{editusername,jdbcType=VARCHAR},
+      </if>
+      <if test="editdate != null">
+        #{editdate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yzw.entity.po.User">
+    update creditmgt.user
+    <set>
+      <if test="name != null">
+        Name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        Password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="cellphone != null">
+        CellPhone = #{cellphone,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        Status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="inusersysno != null">
+        InUserSysNo = #{inusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="inusername != null">
+        InUserName = #{inusername,jdbcType=VARCHAR},
+      </if>
+      <if test="indate != null">
+        InDate = #{indate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editusersysno != null">
+        EditUserSysNo = #{editusersysno,jdbcType=INTEGER},
+      </if>
+      <if test="editusername != null">
+        EditUserName = #{editusername,jdbcType=VARCHAR},
+      </if>
+      <if test="editdate != null">
+        EditDate = #{editdate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.yzw.entity.po.User">
+    update creditmgt.user
+    set Name = #{name,jdbcType=VARCHAR},
+      Password = #{password,jdbcType=VARCHAR},
+      CellPhone = #{cellphone,jdbcType=VARCHAR},
+      Status = #{status,jdbcType=INTEGER},
+      InUserSysNo = #{inusersysno,jdbcType=INTEGER},
+      InUserName = #{inusername,jdbcType=VARCHAR},
+      InDate = #{indate,jdbcType=TIMESTAMP},
+      EditUserSysNo = #{editusersysno,jdbcType=INTEGER},
+      EditUserName = #{editusername,jdbcType=VARCHAR},
+      EditDate = #{editdate,jdbcType=TIMESTAMP}
+    where SysNo = #{sysno,jdbcType=INTEGER}
+  </update>
+</mapper>
